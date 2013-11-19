@@ -1,16 +1,30 @@
 var assert = require('assert');
 
-var SYM_NUMS = ['0', '1', '8'];
+var SYM_DIGITS = ['0', '1', '8'];
 
-var CALLS = 0;
+var SYM_NUMS = [0, 1, 8, 11, 88, 101, 111, 181, 808, 818, 888, 1001, 1111, 1881,
+    8008, 8118, 8888, 10001, 10101, 10801, 11011, 11111, 11811, 18081, 18181,
+    18881, 80008, 80108, 80808, 81018, 81118, 81818, 88088, 88188, 88888];
+function testFinder(fn) {
+  var s = Date.now();
+  for (var i = 1; i < SYM_NUMS.slice(-1); i++) {
+    var next = fn(i);
+    for (var j in SYM_NUMS) {
+      if (SYM_NUMS[j] >= i) {
+        assert.equal(next, SYM_NUMS[j], next + ' !== ' + SYM_NUMS[j] + ', number = ' +i);
+        break;
+      }
+    }
+  }
+  console.log('Done. ET: ' + (Date.now() - s) + 'ms');
+}
 
 function isSym(number) {
-  CALLS++;
   var s = number.toString();
   if (s.length === 0) return true;
-  if (s.length === 1 && SYM_NUMS.indexOf(s[0]) !== -1) return true;
+  if (s.length === 1 && SYM_DIGITS.indexOf(s[0]) !== -1) return true;
   var a = s.substr(0, 1), b = s.slice(-1);
-  if ( a !== b || SYM_NUMS.indexOf(a) === -1 ) return false;
+  if ( a !== b || SYM_DIGITS.indexOf(a) === -1 ) return false;
   return isSym(s.slice(1, -1));
 }
 
@@ -31,6 +45,7 @@ function findNextSym2(number) {
 
 function findNextSym3(number) {
   while (true) {
+    if (isSym(number)) return number;
     var mh = number % 100;
     if (mh === 1) number += 7;
     else if (mh === 8) number += 3;
@@ -38,12 +53,11 @@ function findNextSym3(number) {
     else if (mh === 18) number += 63;
     else if (mh === 88) number += 13;
     else number++;
-
-    if (isSym(number)) return number;
   }
 }
 
 function numLen(number) {
+  if (number === 0 || number === 1) return 1;
   return Math.ceil(Math.log(number)/Math.log(10));
 }
 
@@ -94,7 +108,7 @@ function findNextSym4(number, N) {
     var next = a_pow + a + (innerNext * 10);
     // this happens when the inner value holds constant and a < b which results
     // in the whole value going down. We'll increment and second to smallest
-    if (next < number) return findNextSym4(number + 10, N);
+    if (next < number) return findNextSym4(number + 1, N);
     // phew, things worked out
     return next;
 
@@ -109,44 +123,5 @@ function findNextSym4(number, N) {
   return -1;
 }
 
-assert(isSym(1));
-assert(isSym(181));
-assert(isSym(1001));
-assert(isSym(0));
-assert.equal(isSym(188), false);
-assert.equal(findNextSym(71), 88);
-assert.equal(findNextSym2(71), 88);
-assert.equal(findNextSym3(71), 88);
-assert.equal(findNextSym3(79), 88);
-assert.equal(findNextSym4(71), 88);
-assert.equal(findNextSym4(171), 181);
-assert.equal(findNextSym4(1821), 1881);
-assert.equal(findNextSym4(9), 11);
-assert.equal(findNextSym4(99), 101);
-assert.equal(findNextSym4(899), 1001);
-assert.equal(findNextSym4(119), 181);
-assert.equal(findNextSym4(11113), 11811);
-assert.equal(findNextSym4(10113), 10801);
-
-
-console.error('findNextSym(71)', findNextSym(71));
-
-CALLS = 0;
-var s = Date.now();
-console.error('findNextSym(1156234771)', findNextSym(1156234771));
-console.error('et:', Date.now() - s, 'ms,\ncalls:', CALLS);
-
-CALLS = 0;
-s = Date.now();
-console.error('findNextSym2(1156234771)', findNextSym2(1156234771));
-console.error('et:', Date.now() - s, 'ms,\ncalls:', CALLS);
-
-CALLS = 0;
-s = Date.now();
-console.error('findNextSym3(1156234771)', findNextSym3(1156234771));
-console.error('et:', Date.now() - s, 'ms,\ncalls:', CALLS);
-
-CALLS = 0;
-s = Date.now();
-console.error('findNextSym4(1156234771)', findNextSym4(1156234771));
-console.error('et:', Date.now() - s, 'ms,\ncalls:', CALLS);
+testFinder(findNextSym4);
+testFinder(findNextSym3);
