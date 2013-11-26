@@ -1,13 +1,21 @@
 var assert = require('assert');
 
-var SYM_DIGITS = ['0', '1', '8'];
+var SYM_DIGITS = [0, 1, 8];
 
-var SYM_NUMS = [0, 1, 8, 11, 88, 101, 111, 181, 808, 818, 888, 1001, 1111, 1881,
-    8008, 8118, 8888, 10001, 10101, 10801, 11011, 11111, 11811, 18081, 18181,
-    18881, 80008, 80108, 80808, 81018, 81118, 81818, 88088, 88188, 88888];
-function testFinder(fn) {
+var SYM_NUMS = [0, 1, 8, 11, 25, 52, 88, 101, 111, 181, 205, 215, 285, 502, 512,
+    582, 808, 818, 888, 1001, 1111, 1251, 1521, 1881, 2005, 2115, 2255, 2525,
+    2885, 5002, 5112, 5252, 5522, 5882, 8008, 8118, 8258, 8528, 8888, 10001,
+    10101, 10801, 11011, 11111, 11811, 12051, 12151, 12851, 15021, 15121, 15821,
+    18081, 18181, 18881, 20005, 20105, 20805, 21015, 21115, 21815, 22055, 22155,
+    22855, 25025, 25125, 25825, 28085, 28185, 28885, 50002, 50102, 50802, 51012,
+    51112, 51812, 52052, 52152, 52852, 55022, 55122, 55822, 58082, 58182, 58882,
+    80008, 80108, 80808, 81018, 81118, 81818, 82058, 82158, 82858, 85028, 85128,
+    85828, 88088, 88188, 88888];
+function testFinder(fn, sliceBack) {
   var s = Date.now();
-  for (var i = 1; i < SYM_NUMS.slice(-1); i++) {
+  var stop = SYM_NUMS.slice(sliceBack || -1)[0];
+  console.error('stop', stop);
+  for (var i = 1; i < stop; i++) {
     var next = fn(i);
     for (var j in SYM_NUMS) {
       if (SYM_NUMS[j] >= i) {
@@ -23,14 +31,18 @@ function isSym(number) {
   var s = number.toString();
   if (s.length === 0) return true;
   if (s.length === 1 && SYM_DIGITS.indexOf(s[0]) !== -1) return true;
-  var a = s.substr(0, 1), b = s.slice(-1);
-  if ( a !== b || SYM_DIGITS.indexOf(a) === -1 ) return false;
+  var a = parseInt(s.substr(0, 1), 10), b = parseInt(s.slice(-1), 10);
+  if (a === 2 || a === 5) {
+    if ( (a === 2 && b !== 5) || (a === 5 && b !== 2) ) return false;
+  } else {
+    if (a !== b || SYM_DIGITS.indexOf(a) === -1 ) return false;
+  }
   return isSym(s.slice(1, -1));
 }
 
-function findNextSym(number) {
-  while (!isSym(++number)) {}
-  return number;
+function findNextSym1(number) {
+  while (!isSym(number++)) {}
+  return number-1;
 }
 
 function findNextSym2(number) {
@@ -123,5 +135,7 @@ function findNextSym4(number, N) {
   return -1;
 }
 
-testFinder(findNextSym4);
-testFinder(findNextSym3);
+//testFinder(findNextSym4);
+//testFinder(findNextSym3);
+assert(isSym(25));
+testFinder(findNextSym1, -13);
