@@ -47,11 +47,12 @@ function findNextSym1(number) {
 
 function findNextSym2(number) {
   while (true) {
+    if (isSym(number)) return number;
     var m = number % 10;
-    if (m === 1) number += 7;
+    if (m === 2) number += 3;
+    else if (m === 5) number += 3;
     else if (m === 8) number += 3;
     else number++;
-    if (isSym(number)) return number;
   }
 }
 
@@ -59,10 +60,20 @@ function findNextSym3(number) {
   while (true) {
     if (isSym(number)) return number;
     var mh = number % 100;
-    if (mh === 1) number += 7;
+    if (mh === 2) number += 3;
+    else if (mh === 5) number += 3;
     else if (mh === 8) number += 3;
-    else if (mh === 11) number += 7;
-    else if (mh === 18) number += 63;
+    else if (mh === 12) number += 3;
+    else if (mh === 15) number += 3;
+    else if (mh === 18) number += 3;
+    else if (mh === 22) number += 3;
+    else if (mh === 25) number += 3;
+    else if (mh === 25) number += 26;
+    else if (mh === 52) number += 3;
+    else if (mh === 55) number += 3;
+    else if (mh === 58) number += 23;
+    else if (mh === 82) number += 3;
+    else if (mh === 85) number += 3;
     else if (mh === 88) number += 13;
     else number++;
   }
@@ -98,11 +109,11 @@ function findNextSym4(number, N) {
   // left-most digit
   var a = Math.floor(number/Math.pow(10, N-1));
   // right most digit
-  var b = number % 10;
+  //var b = number % 10;
 
   // starting with 0 can happen because we are dealing with inner digits, so
   // 20345 will pass in 34 with N = 3, which means 034
-  if (a === 0 || a === 1 || a === 8) {
+  if (a === 0 || a === 1 || a === 2 || a === 5 || a === 8) {
     // might not need to increment this digit, go inwards
     var a_pow = a * Math.pow(10, N-1);
     var inner = Math.floor((number - a_pow) / 10);
@@ -114,10 +125,15 @@ function findNextSym4(number, N) {
       if (a === 8) return -1;
       // 1 and zero just jump up to the next sym digit and then fill in the
       // middle with zeros, e.g. 19991 becomes 80008
-      if (a === 1) return 8 * Math.pow(10, N-1) + 8;
+      if (a === 1) return 2 * Math.pow(10, N-1) + 5;
+      if (a === 2) return 5 * Math.pow(10, N-1) + 2;
+      if (a === 5) return 8 * Math.pow(10, N-1) + 8;
       if (a === 0) return Math.pow(10, N-1) + 1;
     }
-    var next = a_pow + a + (innerNext * 10);
+    var next;
+    if (a === 0 || a === 1 || a === 8) next = a_pow + a + (innerNext * 10);
+    else if (a === 2) next = a_pow + 5 + (innerNext * 10);
+    else next = a_pow + 2 + (innerNext * 10);
     // this happens when the inner value holds constant and a < b which results
     // in the whole value going down. We'll increment and second to smallest
     if (next < number) return findNextSym4(number + 1, N);
@@ -127,9 +143,8 @@ function findNextSym4(number, N) {
   }
 
   // for 2-7 we simply return 8____8 with N-2 zeros in the middle
-  if (a > 1 && a < 8) {
-    return 8* Math.pow(10, N-1) + 8;
-  }
+  if (a > 2 && a < 5) return 5 * Math.pow(10, N-1) + 2;
+  if (a > 5 && a < 8) return 8 * Math.pow(10, N-1) + 8;
 
   // a is 9, we need to carry over
   return -1;
@@ -138,4 +153,4 @@ function findNextSym4(number, N) {
 //testFinder(findNextSym4);
 //testFinder(findNextSym3);
 assert(isSym(25));
-testFinder(findNextSym1, -13);
+testFinder(findNextSym4, -13);
